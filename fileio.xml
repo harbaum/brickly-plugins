@@ -1,0 +1,202 @@
+<plugin name="fileio">
+  <!-- translations. At least english (en) is required -->
+  <!-- english translations -->
+  <translations lang="en">
+    <text id="file_message">file on %1 for %2 %3</text>
+    <text id="file_tooltip">Open a file on storage media.</text>
+    <text id="usbstick">USB stick</text>
+    <text id="sdcard">SD card</text>
+    <text id="read">reading</text>
+    <text id="write">writing</text>
+    <text id="append">appending</text>
+    <text id="write_message">write to %1 %2</text>
+    <text id="write_tooltip">Write data into a file.</text>
+    <text id="read_message">read from %1</text>
+    <text id="read_tooltip">Read data from file.</text>
+    <text id="file">file</text>
+    <text id="nocon">TXT not connected!</text>
+  </translations>
+
+  <!-- german translations -->
+  <translations lang="de">
+    <text id="file_message">Datei auf %1 zum %2 %3</text>
+    <text id="file_tooltip">Eine Datei auf Speichermedium öffnen.</text>
+    <text id="usbstick">USB-Stick</text>
+    <text id="sdcard">SD-Karte</text>
+    <text id="read">Lesen</text>
+    <text id="write">Schreiben</text>
+    <text id="append">Anhängen</text>
+    <text id="write_message">schreib in %1 %2</text>
+    <text id="write_tooltip">Schreib Daten in eine Datei.</text>
+    <text id="read_message">lies aus %1</text>
+    <text id="read_tooltip">Lies Daten aus einer Datei.</text>
+    <text id="file">datei</text>
+    <text id="nocon">TXT nicht verbunden!</text>
+  </translations>
+    
+  <!-- This is the global javascript code of the "test" plugin -->
+  <!-- this can be omitted if the plugin doesn't need this -->
+  <code>
+    console.log("fileio plugin loaded")  // this will immediately show up
+  </code>
+
+  <!-- the custom blocks -->
+  <blocks>
+    <!-- https://blockly-demo.appspot.com/static/demos/blockfactory/index.html -->
+    <block type="open_file">
+      <json> {
+      "message0": "{{file_message}}",
+      "args0": [ {
+          "type": "field_dropdown",
+          "name": "media",
+          "options": [ [ "{{usbstick}}", "usb" ],
+                       [ "{{sdcard}}",   "sdc" ] ]
+        }, {
+          "type": "field_dropdown",
+          "name": "mode",
+          "options": [ [ "{{read}}",   "r"   ],
+                       [ "{{write}}",  "w"   ],
+                       [ "{{append}}", "a"   ] ]
+        }, {
+          "type": "input_value",
+          "name": "filename",
+          "check": "String"
+        }
+      ],
+      "output": null,
+      "colour": 230,
+      "tooltip": "{{file_tooltip}}"
+      }
+      </json>
+      <generate>
+	var dropdown_media = block.getFieldValue('media');
+	var dropdown_mode = block.getFieldValue('mode');
+	var value_name = Blockly.Python.valueToCode(block, 'filename', Blockly.Python.ORDER_ATOMIC);
+	var code = '{{_SELF}}.open('+value_name+',"'+dropdown_media+'","'+dropdown_mode+'")';
+	return [code, Blockly.Python.ORDER_NONE];
+      </generate>
+    </block>
+
+    <block type="write_file">
+      <json> {
+        "message0": "{{write_message}}",
+        "args0": [ {
+            "type": "field_variable",
+            "name": "file",
+            "variable": "{{file}}"
+          }, {
+            "type": "input_value",
+            "name": "data"
+          }
+        ],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 230,
+        "tooltip": "{{write_tooltip}}"
+      }
+      </json>
+      <generate>
+	var variable_file = Blockly.Python.variableDB_.getName(block.getFieldValue('file'), Blockly.Variables.NAME_TYPE);
+	var value_data = Blockly.Python.valueToCode(block, 'data', Blockly.Python.ORDER_ATOMIC);
+	var code = '{{_SELF}}.write('+variable_file+','+value_data+')\n';
+	return code;
+      </generate>
+    </block>
+
+    <block type="read_file">
+      <json> {
+      "message0": "{{read_message}}",
+      "args0": [ {
+          "type": "field_variable",
+          "name": "file",
+          "variable": "{{file}}"
+      } ],
+      "output": null,
+      "colour": 230,
+      "tooltip": "{{read_tooltip}}"
+      }
+      </json>
+      <generate>
+	var variable_file = Blockly.Python.variableDB_.getName(block.getFieldValue('file'), Blockly.Variables.NAME_TYPE);
+	var code = '{{_SELF}}.read('+variable_file+')';
+	return [code, Blockly.Python.ORDER_NONE];
+      </generate>
+    </block>
+  </blocks>
+  
+  <!-- This is the toolbox representation of the "file" plugin -->
+  <!-- it will show up in the "custom" (Spezial) category of skill level 5 -->
+  <toolbox type="custom">
+    <sep gap="100"></sep>
+    <block type="open_file" />
+    <block type="write_file" />
+    <block type="read_file" />
+  </toolbox>
+
+  <exec>
+      # local file class encapsulating all file io
+      class File():
+        location = { "usb": "/media/usb0", "sdc": "/boot" };
+      
+        def __init__(self, name, media, mode):
+          self.name = name
+          self.media = media
+          self.mode = mode
+          self.file = None
+
+          try:
+            if media in self.location:
+              fullname = os.path.join(self.location[media], name)
+              self.file = open(fullname, mode)
+          except:
+            pass
+
+        def close(self):
+          if self.file:
+            self.file.close()
+            self.file = None
+
+        def __del__(self):
+          self.close()
+	      
+        def __str__(self):
+          return "("+self.name+","+self.media+","+self.mode+")";
+
+        # write given data into file
+        def write(self, data):
+          if self.file:
+            print(data, file=self.file);
+            self.file.flush()
+
+        def read(self):
+          if not self.file:
+            return None
+	
+          return self.file.read()
+	
+      def __init__(self, parent):
+        self.parent = parent
+        self.files = []
+
+      def open(self, name, media, mode):
+        file = self.File(name, media, mode)
+        self.files.append(file)
+        return file
+	
+      def write(self, file = None, data = None):
+        if isinstance(file, self.File):
+          file.write(data)
+
+      def read(self, file = None):
+        if not isinstance(file, self.File):
+          return None
+	
+        return file.read()
+
+      def cleanup(self):
+        # close all files that may still be open
+        for f in self.files:
+          f.close()
+
+  </exec>
+</plugin>
