@@ -1,0 +1,134 @@
+<plugin name="test">
+  <!-- translations. At least english (en) is required -->
+  <!-- english translations -->
+  <translations lang="en">
+    <text id="catTest">test</text>
+    <text id="test_block">test block</text>
+    <text id="select_1_2_3_message">number %1</text>
+    <text id="select_1_2_3_tooltip">select a number from 1 to 3</text>
+    <text id="one">one</text>
+    <text id="two">two</text>
+    <text id="three">three</text>
+    <text id="button">Press me!</text>
+    <text id="nocon">TXT not connected!</text>
+  </translations>
+
+  <!-- german translations -->
+  <translations lang="de">
+    <text id="catTest">Test</text>
+    <text id="test_block">Test-Block</text>
+    <text id="select_1_2_3_message">Zahl %1</text>
+    <text id="select_1_2_3_tooltip">Auswahl einer Zahl von 1 bis 3</text>
+    <text id="one">Eins</text>
+    <text id="two">Zwei</text>
+    <text id="three">Drei</text>
+    <text id="button">Drück' mich!</text>
+    <text id="nocon">TXT nicht verbunden!</text>
+  </translations>
+    
+  <!-- This is the global javascript code of the "test" plugin -->
+  <!-- this can be omitted if the plugin doesn't need this -->
+  <code>
+    // register a callback function for anything the TXT code might
+    // want to send back
+    Code.plugins["test"]["msg_reply"] = function (msg) {
+      alert("Reply from TXT: " + msg);
+    }
+    
+    Code.plugins["test"]["buttonFunction"] = function() {
+      // send a message to the TXT and display reply
+      if(!Code.connected) {
+        alert("{{nocon}}");
+        return;
+      }
+      
+      // send command to TXT
+      Code.ws.send(JSON.stringify( { "plugin:test:msg": "Hallo TXT!" } ));
+    }
+    
+    console.log("test plugin loaded")  // this will immediately show up
+    Code.workspace.registerButtonCallback("plugin:test:a_button", Code.plugins["test"]["buttonFunction"])
+  </code>
+
+  <!-- the custom blocks -->
+  <blocks>
+    <block type="test"> 
+      <!-- https://blockly-demo.appspot.com/static/demos/blockfactory/index.html -->
+      <json> {
+        "message0": "Block",
+	"previousStatement": null,
+	"nextStatement": null,
+	"colour": 110 }
+      </json>
+
+      <!-- python code generatior written in javascript -->
+      <generate>
+	// {{_SELF}} points to an instance of the python code generated
+	// from the exec element below	
+	return '{{_SELF}}.testfunc("{{test_block}}")\n';
+      </generate>
+    </block>
+
+    <block type="select_1_2_3">
+      <json> {
+        "message0": "{{select_1_2_3_message}}",
+	"args0": [ { 
+	"type": "field_dropdown",
+	"name": "state", 
+	"options": [ ["{{one}}","1"], ["{{two}}","2"], [ "{{three}}","3"] ]
+	} ],
+	"output": "Number",
+	"colour": 100,
+	"tooltip": "{{select_1_2_3_tooltip}}"
+	}
+      </json>
+      <generate>
+	var state = block.getFieldValue('state');
+	return [state, Blockly.Python.ORDER_NONE];
+      </generate>
+    </block>
+
+  </blocks>
+
+  <!-- This is the toolbox representation of the "test" plugin -->
+  <!-- it will show up as a subcategory in the "custom" (Spezial) category of skill level 5 -->
+  <toolbox type="custom">
+    <category name="{{catTest}}" colour="100">
+      <block type="test" />
+      <block type="select_1_2_3" />
+      <button text="{{button}}" callbackKey="plugin:test:a_button"></button>
+    </category>
+  </toolbox>
+
+  <!-- Code for the execution on TXT side. This part is never  -->
+  <!-- read by the blockly code and it's the only part that's  -->
+  <!-- used by the TXT. All code will be placed inside a class -->
+  <!-- with the name of the plugin ('test' in this case)       -->
+  <!-- WARNING: python is indentention sensitive while xml     -->
+  <!--          is not. Indentation cares here!                -->
+  <!-- Also note: Since this is not loaded on Browser side,    -->
+  <!-- translations don't work. This would require extra magic -->
+  <exec>
+      def __init__(self, parent):
+        self.parent = parent
+        print("test plugin init", parent)
+      
+      # this function is invoked from the button from javascript side
+      def msg(self, str):
+        self.parent.tx(json.dumps( { "plugin:test:msg_reply": "Hallo Browser" } ))
+
+      def testfunc(self, str):
+        print("test plugin testfunc("+str+")");
+
+      # a plugin may implement a init functon which is called whenever a program is
+      # being started
+      def init(self):
+        pass
+
+      # a plugin may implement a cleanup functon which is called whenever a program
+      # has ended
+      def cleanup(self):
+        pass
+
+  </exec>
+</plugin>

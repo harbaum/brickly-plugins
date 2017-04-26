@@ -37,3 +37,12 @@ in the custrom (Spezial) category.
 An example program looks like:
 
 ![fileio plugin](fileio.png)
+
+### test - test.xml
+
+A simple test plugin without a really useful functionalty. This
+shows some of the basic plugin concepts and e.g. implements its own
+toolbox sub category as well a button inside the toolbox which
+directly interacts with the TXT.
+
+![test plugin](test.png)
