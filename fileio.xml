@@ -136,7 +136,7 @@
   <exec>
       # local file class encapsulating all file io
       class File():
-        location = { "usb": "/media/usb0", "sdc": "/boot" };
+        location = { "usb": "/media/usb0", "sdc": "/home/ftc" };
       
         def __init__(self, name, media, mode):
           self.name = name
