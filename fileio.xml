@@ -1,7 +1,7 @@
 <plugin name="fileio">
   <!-- translations. At least english (en) is required -->
   <!-- english translations -->
-  <translations lang="en">
+  <translations lang="en" name="File IO">
     <text id="file_message">file on %1 for %2 %3</text>
     <text id="file_tooltip">Open a file on storage media.</text>
     <text id="usbstick">USB stick</text>
@@ -18,7 +18,7 @@
   </translations>
 
   <!-- german translations -->
-  <translations lang="de">
+  <translations lang="de" name="Datei-E/A">
     <text id="file_message">Datei auf %1 zum %2 %3</text>
     <text id="file_tooltip">Eine Datei auf Speichermedium öffnen.</text>
     <text id="usbstick">USB-Stick</text>

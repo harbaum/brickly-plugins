@@ -1,7 +1,7 @@
 <plugin name="test">
   <!-- translations. At least english (en) is required -->
   <!-- english translations -->
-  <translations lang="en">
+  <translations lang="en" name="Test">>
     <text id="catTest">test</text>
     <text id="test_block">test block</text>
     <text id="select_1_2_3_message">number %1</text>
@@ -14,7 +14,7 @@
   </translations>
 
   <!-- german translations -->
-  <translations lang="de">
+  <translations lang="de" name="Test">
     <text id="catTest">Test</text>
     <text id="test_block">Test-Block</text>
     <text id="select_1_2_3_message">Zahl %1</text>
