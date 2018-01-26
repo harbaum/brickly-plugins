@@ -1,0 +1,183 @@
+<plugin name="ftduino">
+  <!-- translations. At least english (en) is required -->
+  <!-- english translations -->
+  <translations lang="en" name="ftDuino">>
+    <text id="catFtduino">ftDuino</text>
+    <text id="output_message">set ftDuino output %1 %2</text>
+    <text id="output_tooltip">Switch an ftDuino output</text>
+    <text id="input_message">%1 on ftDuino input %2</text>
+    <text id="input_tooltip">Read the state of an ftDuino input</text>
+    <text id="input_voltage">voltage in mV</text>
+    <text id="input_resistor">resistance</text>
+    <text id="input_switch">switch state</text>
+    <text id="button">Check for ftDuino ...</text>
+    <text id="nocon">Controller not connected!</text>
+    <text id="conFtd">Connected ftDuino: </text>
+    <text id="noConFtd">No ftDuino connected!</text>
+   </translations>
+
+  <!-- german translations -->
+  <translations lang="de" name="ftDuino">
+    <text id="catFtduino">ftDuino</text>
+    <text id="output_message">schalte ftDuino-Ausgang %1 %2</text>
+    <text id="output_tooltip">Schalte einen ftDuino-Ausgang</text>
+    <text id="input_message">%1 an ftDuino-Eingang %2</text>
+    <text id="input_tooltip">Lies den Zustand eines ftDuino-Eingangs</text>
+    <text id="input_voltage">Spannung in mV</text>
+    <text id="input_resistor">Widerstand</text>
+    <text id="input_switch">Schalterzustand</text>
+    <text id="button">Suche nach ftDuino ...</text>
+    <text id="nocon">Controller nicht verbunden!</text>
+    <text id="conFtd">Verbundener ftDuino: </text>
+    <text id="noConFtd">Kein ftDuino verbunden!</text>
+   </translations>
+    
+  <!-- This is the global javascript code of the "ftduino" plugin -->
+  <!-- this can be omitted if the plugin doesn't need this -->
+  <code>
+    // register a callback function for anything the TXT code might
+    // want to send back
+    Code.plugins["ftduino"]["check_reply"] = function(msg) {
+      if(msg == null)
+        alert("{{noConFtd}}");
+      else
+        alert("{{conFtd}}" + msg);
+    }
+      
+    Code.plugins["ftduino"]["checkButton"] = function() {
+      // send a message to the TXT and display reply
+      if(!Code.connected) {
+        alert("{{nocon}}");
+        return;
+      }
+      
+      // send command to TXT
+      Code.ws.send(JSON.stringify( { "plugin:ftduino:check": "true" } ));
+    }
+ 
+    console.log("ftDuino plugin loaded")  // this will immediately show up
+    Code.workspace.registerButtonCallback("plugin:ftduino:checkButton", Code.plugins["ftduino"]["checkButton"])
+  </code>
+
+  <!-- the custom blocks -->
+  <blocks>
+    <block type="input">
+      <json> {
+        "message0": "{{input_message}}",
+        "args0": [
+          { "type": "field_dropdown",
+	    "name": "type",
+	    "options": [
+              [ "{{input_voltage}}",    "Voltage"    ],
+              [ "{{input_switch}}",     "Switch"     ],
+              [ "{{input_resistor}}",   "Resistance" ]
+	    ]
+	  }, {
+	    "type": "field_dropdown",
+	    "name": "input_port",
+	    "options": [
+              [ "I1", "I1" ], [ "I2", "I2" ], [ "I3", "I3" ], [ "I4", "I4" ],
+              [ "I5", "I4" ], [ "I6", "I6" ], [ "I7", "I7" ], [ "I8", "I8" ]
+	    ]
+          }
+        ],
+        "output": "Number",
+        "colour": 220,
+        "tooltip": "{{input_tooltip}}"
+      }
+      </json>
+      <generate>
+        var type = block.getFieldValue('type');
+        var port = block.getFieldValue('input_port');
+        code = '{{_SELF}}.input_get("%1", "%2")'.replace("%1", type).replace('%2', port);
+        return [code, Blockly.Python.ORDER_NONE];
+      </generate>
+    </block>
+    <block type="output">
+      <json> {
+        "message0": "{{output_message}}",
+	"args0": [ { 
+	"type": "field_dropdown",
+	"name": "port", 
+	"options": [ ["O1","O1"], ["O2","O2"], [ "O3","O3"], ["O4","O4"], ["O5","O5"], [ "O6","O6"], ["O7","O7"], [ "O8","O8"] ]
+	}, {
+        "type": "input_value",
+        "name": "value",
+        "check": "Number"
+        }],
+        "previousStatement": null,
+        "nextStatement": null,
+	"colour": 220,
+	"tooltip": "{{output_tooltip}}"
+      }
+      </json>
+      <generate>
+        var port = block.getFieldValue('port');
+        var value = Blockly.Python.valueToCode(block, 'value', Blockly.Python.ORDER_ATOMIC);
+        var cmd = '{{_SELF}}.output_set("%1", %2)\n'.replace('%1', port).replace('%2', value);
+        // console.log("CMD:", cmd);
+        return cmd;
+      </generate>
+    </block>
+
+  </blocks>
+
+  <!-- This is the toolbox representation of the "ftduino" plugin -->
+  <!-- it will show up as a subcategory in the "custom" (Spezial) category of skill level 5 -->
+  <toolbox type="custom">
+      <button text="{{button}}" callbackKey="plugin:ftduino:checkButton"></button>
+  </toolbox>
+  
+  <toolbox type="output">
+      <block type="output" />
+  </toolbox>
+
+  <toolbox type="input">
+      <block type="input" />
+  </toolbox>
+
+  <!-- Code for the execution on TXT side. This part is never  -->
+  <!-- read by the blockly code and it's the only part that's  -->
+  <!-- used by the TXT. All code will be placed inside a class -->
+  <!-- with the name of the plugin ('ftduino' in this case)    -->
+  <!-- WARNING: python is indentention sensitive while xml     -->
+  <!--          is not. Indentation cares here!                -->
+  <!-- Also note: Since this is not loaded on Browser side,    -->
+  <!-- translations don't work. This would require extra magic -->
+  <exec>
+      import ftduino_direct as ftd
+    
+      def __init__(self, parent):
+        self.parent = parent
+        print("ftDuino plugin init", parent)
+        self.ftduino = self.ftd.ftduino()
+	
+      # this function is invoked from the button from javascript side
+      def check(self, str):
+        if self.ftduino.getDevice() == None:
+          self.parent.tx(json.dumps( { "plugin:ftduino:check_reply": None } ))
+        else:
+          self.parent.tx(json.dumps( { "plugin:ftduino:check_reply": self.ftduino.comm("ftduino_id_get") } ))
+
+      # a plugin may implement a init functon which is called whenever a program is
+      # being started
+      def init(self):
+        pass
+
+      def input_get(self, a, b):
+        self.ftduino.comm("input_set_mode "+b+" "+a)
+        result=self.ftduino.comm("input_get "+b)
+        return int(result)
+
+      def output_set(self, a, b):
+        self.ftduino.comm("output_set "+a+" 1 "+str(int(5.12*b)))
+
+      # a plugin may implement a cleanup functon which is called whenever a program
+      # has ended
+      def cleanup(self):
+        # switch off all outputs
+        for o in range(8):
+          self.ftduino.comm("output_set O"+str(o+1)+" 0 0");
+
+  </exec>
+</plugin>
