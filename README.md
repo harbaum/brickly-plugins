@@ -29,6 +29,15 @@ fileio
 
 ## The plugins
 
+### ftDuino IO - ftduino.xml
+
+This plugin gives brickly access to the IOs of an [ftDuino](http://ftduino.de)
+connected via USB to the TXT or [TX-PI](https://github.com/harbaum/tx-pi).
+
+The ftDuino needs to run the [ftduino_direct sketch](https://github.com/PeterDHabermehl/ftduino_direct).
+
+![ftduino plugin](ftduino.png)
+
 ### file IO - fileio.xml
 
 Provides blocks to read and write simple files. The new blocks show up
