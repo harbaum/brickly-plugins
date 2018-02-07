@@ -8,24 +8,11 @@ change.
 
 ## Installation
 
-Currently there is no automatic way to install plugins. You need to copy
-the desired plugin onto your TXT into the directory 
+Since version 1.38 brickly can upload plugins via the main web interface.
+In skill leven 5 clicking the "plug" icon will open a menu which allows
+to install plugins.
 
-```
-/opt/ftc/apps/user/1f2d90a3-11e9-4a92-955a-73ffaec0fe71/plugins
-```
-
-and create a matching entry in the file
-```
-/opt/ftc/apps/user/1f2d90a3-11e9-4a92-955a-73ffaec0fe71/plugins/plugins.list
-```
-
-E.g. when installing fileio.xml the ```plugins.list``` should read:
-
-```
-; list of installed plugins
-fileio
-```
+![plugin installation](plugin_install.png)
 
 ## The plugins
 
