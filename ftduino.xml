@@ -1,15 +1,21 @@
-<plugin name="ftduino">
+<plugin name="ftduino" version="1.1">
   <!-- translations. At least english (en) is required -->
   <!-- english translations -->
   <translations lang="en" name="ftDuino">>
     <text id="catFtduino">ftDuino</text>
     <text id="output_message">set ftDuino output %1 %2</text>
     <text id="output_tooltip">Switch an ftDuino output</text>
+    <text id="motor_message">start ftDuino motor %1 %2 with %3</text>
+    <text id="motor_tooltip">Switch an ftDuino motor output</text>
+    <text id="motor_stop_message">stop ftDuino motor %1</text>
+    <text id="motor_stop_tooltip">Switch an ftDuino motor off</text>
     <text id="input_message">%1 on ftDuino input %2</text>
     <text id="input_tooltip">Read the state of an ftDuino input</text>
     <text id="input_voltage">voltage in mV</text>
     <text id="input_resistor">resistance</text>
     <text id="input_switch">switch state</text>
+    <text id="left">left \u21BA</text>
+    <text id="right">right \u21BB</text>
     <text id="button">Check for ftDuino ...</text>
     <text id="nocon">Controller not connected!</text>
     <text id="conFtd">Connected ftDuino: </text>
@@ -21,11 +27,17 @@
     <text id="catFtduino">ftDuino</text>
     <text id="output_message">schalte ftDuino-Ausgang %1 %2</text>
     <text id="output_tooltip">Schalte einen ftDuino-Ausgang</text>
+    <text id="motor_message">starte ftDuino-Motor %1 %2 mit %3</text>
+    <text id="motor_tooltip">Schalte einen ftDuino-Motor-Ausgang</text>
+    <text id="motor_stop_message">stoppe ftDuino-Motor %1</text>
+    <text id="motor_stop_tooltip">Schalte einen ftDuino-Motor-Ausgang aus</text>
     <text id="input_message">%1 an ftDuino-Eingang %2</text>
     <text id="input_tooltip">Lies den Zustand eines ftDuino-Eingangs</text>
     <text id="input_voltage">Spannung in mV</text>
     <text id="input_resistor">Widerstand</text>
     <text id="input_switch">Schalterzustand</text>
+    <text id="left">links \u21BA</text>
+    <text id="right">rechts \u21BB</text>
     <text id="button">Suche nach ftDuino ...</text>
     <text id="nocon">Controller nicht verbunden!</text>
     <text id="conFtd">Verbundener ftDuino: </text>
@@ -119,6 +131,56 @@
         return cmd;
       </generate>
     </block>
+    <block type="motor">
+      <json> {
+        "message0": "{{motor_message}}",
+	"args0": [ { 
+	"type": "field_dropdown",
+	"name": "port", 
+	"options": [ ["M1","M1"], ["M2","M2"], [ "M3","M3"], [ "M4","M4"] ]
+	}, {
+        "type": "field_dropdown",
+        "name": "dir",
+	"options": [ ["{{left}}", "left"], ["{{right}}", "right"] ]
+	}, {
+        "type": "input_value",
+        "name": "value",
+        "check": "Number"
+        }],
+        "previousStatement": null,
+        "nextStatement": null,
+	"colour": 220,
+	"tooltip": "{{motor_tooltip}}"
+      }
+      </json>
+      <generate>
+        var port = block.getFieldValue('port');
+        var dir = block.getFieldValue('dir');
+        var value = Blockly.Python.valueToCode(block, 'value', Blockly.Python.ORDER_ATOMIC);
+        var cmd = '{{_SELF}}.motor_set("%1", "%2", %3)\n'.replace('%1', port).replace('%2', dir).replace('%3', value);
+        return cmd;
+      </generate>
+    </block>
+    <block type="motor_stop">
+      <json> {
+        "message0": "{{motor_stop_message}}",
+	"args0": [ { 
+	"type": "field_dropdown",
+	"name": "port", 
+	"options": [ ["M1","M1"], ["M2","M2"], [ "M3","M3"], [ "M4","M4"] ]
+        }],
+        "previousStatement": null,
+        "nextStatement": null,
+	"colour": 220,
+	"tooltip": "{{motor_stop_tooltip}}"
+      }
+      </json>
+      <generate>
+        var port = block.getFieldValue('port');
+        var cmd = '{{_SELF}}.motor_set("%1", "brake", 0)\n'.replace('%1', port);
+        return cmd;
+      </generate>
+    </block>
 
   </blocks>
 
@@ -130,6 +192,8 @@
   
   <toolbox type="output">
       <block type="output" />
+      <block type="motor" />
+      <block type="motor_stop" />
   </toolbox>
 
   <toolbox type="input">
@@ -171,6 +235,9 @@
 
       def output_set(self, a, b):
         self.ftduino.comm("output_set "+a+" 1 "+str(int(5.12*b)))
+
+      def motor_set(self, a, b, c):
+        self.ftduino.comm("motor_set "+a+" "+b+" "+str(int(5.12*c)))
 
       # a plugin may implement a cleanup functon which is called whenever a program
       # has ended
