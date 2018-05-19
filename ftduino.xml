@@ -3,6 +3,8 @@
   <!-- english translations -->
   <translations lang="en" name="ftDuino">>
     <text id="catFtduino">ftDuino</text>
+    <text id="led_message">set ftDuino LED %1</text>
+    <text id="led_tooltip">Switch the red ftDuino LED</text>
     <text id="output_message">set ftDuino output %1 %2</text>
     <text id="output_tooltip">Switch an ftDuino output</text>
     <text id="motor_message">start ftDuino motor %1 %2 with %3</text>
@@ -25,6 +27,8 @@
   <!-- german translations -->
   <translations lang="de" name="ftDuino">
     <text id="catFtduino">ftDuino</text>
+    <text id="led_message">schalte ftDuino LED %1</text>
+    <text id="led_tooltip">Schalte die rote ftDuino LED</text>
     <text id="output_message">schalte ftDuino-Ausgang %1 %2</text>
     <text id="output_tooltip">Schalte einen ftDuino-Ausgang</text>
     <text id="motor_message">starte ftDuino-Motor %1 %2 mit %3</text>
@@ -131,6 +135,26 @@
         return cmd;
       </generate>
     </block>
+    <block type="led">
+      <json> {
+        "message0": "{{led_message}}",
+	"args0": [ {
+        "type": "input_value",
+        "name": "state",
+        "check": "Number"
+        }],
+        "previousStatement": null,
+        "nextStatement": null,
+	"colour": 220,
+	"tooltip": "{{led_tooltip}}"
+      }
+      </json>
+      <generate>
+        var state = Blockly.Python.valueToCode(block, 'state', Blockly.Python.ORDER_ATOMIC);
+        var cmd = '{{_SELF}}.led_set(%1)\n'.replace('%1', state);
+        return cmd;
+      </generate>
+    </block>
     <block type="motor">
       <json> {
         "message0": "{{motor_message}}",
@@ -191,6 +215,7 @@
   </toolbox>
   
   <toolbox type="output">
+      <block type="led" />
       <block type="output" />
       <block type="motor" />
       <block type="motor_stop" />
@@ -238,6 +263,9 @@
 
       def motor_set(self, a, b, c):
         self.ftduino.comm("motor_set "+a+" "+b+" "+str(int(5.12*c)))
+
+      def led_set(self, a):
+        self.ftduino.comm("LED_set "+str(int(bool(a))))
 
       # a plugin may implement a cleanup functon which is called whenever a program
       # has ended
