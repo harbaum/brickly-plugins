@@ -3,14 +3,22 @@
   <!-- english translations -->
   <translations lang="en" name="ftDuino">>
     <text id="catFtduino">ftDuino</text>
+    <text id="led_message">set ftDuino LED %1</text>
+    <text id="led_tooltip">Switch the red ftDuino LED</text>
     <text id="output_message">set ftDuino output %1 %2</text>
     <text id="output_tooltip">Switch an ftDuino output</text>
     <text id="motor_message">start ftDuino motor %1 %2 with %3</text>
     <text id="motor_tooltip">Switch an ftDuino motor output</text>
     <text id="motor_stop_message">stop ftDuino motor %1</text>
     <text id="motor_stop_tooltip">Switch an ftDuino motor off</text>
+    <text id="counter_reset_message">reset ftDuino counter %1</text>
+    <text id="counter_reset_tooltip">Set the value of an ftDuino counter to 0</text>
     <text id="input_message">%1 on ftDuino input %2</text>
     <text id="input_tooltip">Read the state of an ftDuino input</text>
+    <text id="counter_message">ftDuino counter %1</text>
+    <text id="counter_tooltip">Read the value of an ftDuino input</text>
+    <text id="distance_message">distance in cm</text>
+    <text id="distance_tooltip">Read the distance from an ultrasonic distance sensor connected to C1</text>
     <text id="input_voltage">voltage in mV</text>
     <text id="input_resistor">resistance</text>
     <text id="input_switch">switch state</text>
@@ -25,14 +33,22 @@
   <!-- german translations -->
   <translations lang="de" name="ftDuino">
     <text id="catFtduino">ftDuino</text>
+    <text id="led_message">schalte ftDuino LED %1</text>
+    <text id="led_tooltip">Schalte die rote ftDuino LED</text>
     <text id="output_message">schalte ftDuino-Ausgang %1 %2</text>
     <text id="output_tooltip">Schalte einen ftDuino-Ausgang</text>
     <text id="motor_message">starte ftDuino-Motor %1 %2 mit %3</text>
     <text id="motor_tooltip">Schalte einen ftDuino-Motor-Ausgang</text>
     <text id="motor_stop_message">stoppe ftDuino-Motor %1</text>
     <text id="motor_stop_tooltip">Schalte einen ftDuino-Motor-Ausgang aus</text>
+    <text id="counter_reset_message">Zähler %1 zurücksetzen</text>
+    <text id="counter_reset_tooltip">Setze den Wert eines ftDuino-Zähler-Eingangs auf 0</text>
     <text id="input_message">%1 an ftDuino-Eingang %2</text>
     <text id="input_tooltip">Lies den Zustand eines ftDuino-Eingangs</text>
+    <text id="counter_message">ftDuino Zähler %1</text>
+    <text id="counter_tooltip">Lies den aktuellen Wert eines ftDuino-Zähler-Eingangs</text>
+    <text id="distance_message">Entfernung in cm</text>
+    <text id="distance_tooltip">Lies den aktuellen Wert eines Ultraschall-Sensors an C1</text>
     <text id="input_voltage">Spannung in mV</text>
     <text id="input_resistor">Widerstand</text>
     <text id="input_switch">Schalterzustand</text>
@@ -105,6 +121,64 @@
         return [code, Blockly.Python.ORDER_NONE];
       </generate>
     </block>
+    <block type="distance">
+      <json> {
+        "message0": "{{distance_message}}",
+        "output": "Number",
+        "colour": 220,
+        "tooltip": "{{distance_tooltip}}"
+      }
+      </json>
+      <generate>
+        code = '{{_SELF}}.distance_get()';
+        return [code, Blockly.Python.ORDER_NONE];
+      </generate>
+    </block>
+    <block type="counter">
+      <json> {
+        "message0": "{{counter_message}}",
+        "args0": [{
+	    "type": "field_dropdown",
+	    "name": "input_port",
+	    "options": [
+              [ "C1", "C1" ], [ "C2", "C2" ], [ "C3", "C3" ], [ "C4", "C4" ]
+	    ]
+          }
+        ],
+        "output": "Number",
+        "colour": 220,
+        "tooltip": "{{counter_tooltip}}"
+      }
+      </json>
+      <generate>
+        var port = block.getFieldValue('input_port');
+        code = '{{_SELF}}.counter_get("%1")'.replace("%1", port);
+        return [code, Blockly.Python.ORDER_NONE];
+      </generate>
+    </block>
+    <block type="counter_reset">
+      <json> {
+        "message0": "{{counter_reset_message}}",
+        "args0": [{
+	    "type": "field_dropdown",
+	    "name": "input_port",
+	    "options": [
+              [ "C1", "C1" ], [ "C2", "C2" ], [ "C3", "C3" ], [ "C4", "C4" ]
+	    ]
+          }
+        ],
+        "previousStatement": null,
+        "nextStatement": null,
+        "colour": 220,
+        "tooltip": "{{counter_reset_tooltip}}"
+      }
+      </json>
+      <generate>
+        var port = block.getFieldValue('input_port');
+        var cmd = '{{_SELF}}.counter_reset("%1")\n'.replace("%1", port);
+        return cmd;
+      </generate>
+    </block>
     <block type="output">
       <json> {
         "message0": "{{output_message}}",
@@ -128,6 +202,26 @@
         var value = Blockly.Python.valueToCode(block, 'value', Blockly.Python.ORDER_ATOMIC);
         var cmd = '{{_SELF}}.output_set("%1", %2)\n'.replace('%1', port).replace('%2', value);
         // console.log("CMD:", cmd);
+        return cmd;
+      </generate>
+    </block>
+    <block type="led">
+      <json> {
+        "message0": "{{led_message}}",
+	"args0": [ {
+        "type": "input_value",
+        "name": "state",
+        "check": "Number"
+        }],
+        "previousStatement": null,
+        "nextStatement": null,
+	"colour": 220,
+	"tooltip": "{{led_tooltip}}"
+      }
+      </json>
+      <generate>
+        var state = Blockly.Python.valueToCode(block, 'state', Blockly.Python.ORDER_ATOMIC);
+        var cmd = '{{_SELF}}.led_set(%1)\n'.replace('%1', state);
         return cmd;
       </generate>
     </block>
@@ -191,13 +285,17 @@
   </toolbox>
   
   <toolbox type="output">
+      <block type="led" />
       <block type="output" />
       <block type="motor" />
       <block type="motor_stop" />
+      <block type="counter_reset" />
   </toolbox>
 
   <toolbox type="input">
       <block type="input" />
+      <block type="counter" />
+      <block type="distance" />
   </toolbox>
 
   <!-- Code for the execution on TXT side. This part is never  -->
@@ -215,6 +313,13 @@
         self.parent = parent
         print("ftDuino plugin init", parent)
         self.ftduino = self.ftd.ftduino()
+        self.__ultrasonic_enabled = False
+
+
+      def __ultrasonic_enable(self, enable):
+        if enable != self.__ultrasonic_enabled:
+            self.__ultrasonic_enabled = enable
+            self.ftduino.comm("ultrasonic_enable " + ("true" if enable else "false"))
 	
       # this function is invoked from the button from javascript side
       def check(self, str):
@@ -238,6 +343,26 @@
 
       def motor_set(self, a, b, c):
         self.ftduino.comm("motor_set "+a+" "+b+" "+str(int(5.12*c)))
+
+      def led_set(self, a):
+        self.ftduino.comm("LED_set "+str(int(bool(a))))
+
+      def counter_get(self, a):
+        if a == "C1":
+            self.__ultrasonic_enable(False)
+        result=self.ftduino.comm("counter_get "+a)
+        return int(result)
+
+      def counter_reset(self, a):
+        if a == "C1":
+            self.__ultrasonic_enable(False)
+        self.ftduino.comm("counter_set_mode " + a + " rising")
+        self.ftduino.comm("counter_clear " + a)
+
+      def distance_get(self):
+        self.__ultrasonic_enable(True)
+        result=self.ftduino.comm("ultrasonic_get")
+        return int(result)
 
       # a plugin may implement a cleanup functon which is called whenever a program
       # has ended
