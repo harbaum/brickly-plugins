@@ -11,7 +11,7 @@
     <text id="motor_tooltip">Switch a ftDuino motor output</text>
     <text id="motor_stop_message">stop ftDuino motor %1</text>
     <text id="motor_stop_tooltip">Switch an ftDuino motor off</text>
-    <text id="servo_message">set servo %1 to %2</text>    
+    <text id="servo_message">set servo %1 to %2 degrees</text>    
     <text id="servo_tooltip">Set a ftDuino servo output</text>
     <text id="counter_reset_message">reset ftDuino counter %1</text>
     <text id="counter_reset_tooltip">Set the value of a ftDuino counter to 0</text>
@@ -43,7 +43,7 @@
     <text id="motor_tooltip">Schalte einen ftDuino-Motor-Ausgang</text>
     <text id="motor_stop_message">stoppe ftDuino-Motor %1</text>
     <text id="motor_stop_tooltip">Schalte einen ftDuino-Motor-Ausgang aus</text>
-    <text id="servo_message">setze Servo %1 auf Winkel %2</text>    
+    <text id="servo_message">setze Servo %1 auf %2 Grad</text>    
     <text id="servo_tooltip">Setze ein ftDuino-Servo-Ausgang</text>
     <text id="counter_reset_message">Zähler %1 zurücksetzen</text>
     <text id="counter_reset_tooltip">Setze den Wert eines ftDuino-Zähler-Eingangs auf 0</text>
