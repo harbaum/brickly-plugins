@@ -10,11 +10,9 @@
     <text id="motor_message">start ftDuino motor %1 %2 with %3</text>
     <text id="motor_tooltip">Switch a ftDuino motor output</text>
     <text id="motor_stop_message">stop ftDuino motor %1</text>
-    <text id="motor_stop_tooltip">Switch a ftDuino motor off</text>
-    <text id="servo_message">set pulsewidth I2C-servo %1 to %2</text>    
-    <text id="servo_tooltip">Switch an I2C-PCA9685 servo output</text>
-    <text id="servo_angle_message">set position I2C-servo %1 of type %2 to %3 degrees</text>    
-    <text id="servo_angle_tooltip">Switch an I2C-PCA9685 servo output</text>
+    <text id="motor_stop_tooltip">Switch an ftDuino motor off</text>
+    <text id="servo_message">set servo %1 to %2</text>    
+    <text id="servo_tooltip">Set a ftDuino servo output</text>
     <text id="counter_reset_message">reset ftDuino counter %1</text>
     <text id="counter_reset_tooltip">Set the value of a ftDuino counter to 0</text>
     <text id="input_message">%1 on ftDuino input %2</text>
@@ -45,10 +43,8 @@
     <text id="motor_tooltip">Schalte einen ftDuino-Motor-Ausgang</text>
     <text id="motor_stop_message">stoppe ftDuino-Motor %1</text>
     <text id="motor_stop_tooltip">Schalte einen ftDuino-Motor-Ausgang aus</text>
-    <text id="servo_message">drehe I2C-Servo %1 auf %2</text>    
-    <text id="servo_tooltip">Schalte einen I2C-PCA9685-Servo-Ausgang</text>
-    <text id="servo_angle_message">setze Position I2C-Servo %1 vom Typ %2 auf %3 Grad</text>    
-    <text id="servo_angle_tooltip">Schalte einen I2C-PCA9685-Servo-Ausgang</text>
+    <text id="servo_message">setze Servo %1 auf Winkel %2</text>    
+    <text id="servo_tooltip">Setze ein ftDuino-Servo-Ausgang</text>
     <text id="counter_reset_message">Zähler %1 zurücksetzen</text>
     <text id="counter_reset_tooltip">Setze den Wert eines ftDuino-Zähler-Eingangs auf 0</text>
     <text id="input_message">%1 an ftDuino-Eingang %2</text>
@@ -289,7 +285,7 @@
 	"args0": [ { 
 	"type": "field_dropdown",
 	"name": "port", 
-	"options": [ ["S00","00"], ["S01","01"], [ "S02","02"], [ "S03","03"], ["S04","04"], ["S05","05"], [ "S06","06"], [ "S07","07"], ["S08","08"], ["S09","09"], [ "S10","10"], [ "S11","11"], ["S12","12"], ["S13","13"], [ "S14","14"], [ "S15","15"]  ]
+	"options": [ ["0","0"], ["1","1"] ]
 	}, {
         "type": "input_value",
         "name": "value",
@@ -304,37 +300,7 @@
       <generate>
         var port = block.getFieldValue('port');
         var value = Blockly.Python.valueToCode(block, 'value', Blockly.Python.ORDER_ATOMIC);
-        var cmd =  '{{_SELF}}.servo_set("%1", "%2")\n'.replace('%1', port).replace('%2', value);
-        return cmd;
-      </generate>
-    </block>
-	<block type="servo_angle">
-      <json> {
-        "message0": "{{servo_angle_message}}",
-	"args0": [ { 
-	"type": "field_dropdown",
-	"name": "port", 
-	"options": [ ["S00","00"], ["S01","01"], [ "S02","02"], [ "S03","03"], ["S04","04"], ["S05","05"], [ "S06","06"], [ "S07","07"], ["S08","08"], ["S09","09"], [ "S10","10"], [ "S11","11"], ["S12","12"], ["S13","13"], [ "S14","14"], [ "S15","15"]  ]
-	}, {
-        "type": "field_dropdown",
-        "name": "servotype",
-		"options": [ ["SG90", "SG90"] ]
-	}, {
-        "type": "input_value",
-        "name": "value",
-        "check": "Number"
-        }],
-        "previousStatement": null,
-        "nextStatement": null,
-	"colour": 220,
-	"tooltip": "{{servo_angle_tooltip}}"
-      }
-      </json>
-      <generate>
-        var port = block.getFieldValue('port');
-		var servotype = block.getFieldValue('servotype');
-        var value = Blockly.Python.valueToCode(block, 'value', Blockly.Python.ORDER_ATOMIC);
-        var cmd =  '{{_SELF}}.servo_setAngle("%1", "%2", "%3")\n'.replace('%1', port).replace('%2', value).replace('%3', servotype);
+        var cmd =  '{{_SELF}}.servo_set(%1, %2)\n'.replace('%1', port).replace('%2', value);
         return cmd;
       </generate>
     </block>
@@ -352,7 +318,6 @@
       <block type="motor" />
       <block type="motor_stop" />
       <block type="servo" />
-	  <block type="servo_angle" />
       <block type="counter_reset" />
   </toolbox>
 
@@ -412,13 +377,9 @@
         self.ftduino.comm("motor_set "+a+" "+b+" "+str(int(5.12*c)))
 
       def servo_set(self, a, b):
-        self.ftduino.comm("pwm_set "+a+" 0 "+b)
+        # map b -45 .. +45 to 63 .. 125
+        self.ftduino.comm("i2c_write 17 "+str(a)+" "+str(94 + int(b*31/45)))
 
-      def servo_setAngle(self, a, b, c):
-        if c == "SG90":
-            pulsewidth=self.__arduino_map(int(b), 0, 180, 140, 650)
-        self.ftduino.comm("pwm_set "+a+" 0 "+str(pulsewidth))
-		
       def led_set(self, a):
         self.ftduino.comm("LED_set "+str(int(bool(a))))
 

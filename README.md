@@ -27,17 +27,33 @@ sketch](https://github.com/PeterDHabermehl/ftduino_direct).
 
 ![ftduino plugin](ftduino.png)
 
-### ftDuino PCA9685 servo driver - ftduino_PCA9685.xml
+### ftDuino IO with ftDuino servo adapter support - ftduino_servo.xml
+
+This plugin gives brickly access to the [ftDuino mini servo
+adapter](https://harbaum.github.io/ftduino/www/manual/experimente.html#6.13.9) connected via I²C
+to a [ftDuino](http://ftduino.de) which in turn is connected via USB
+to the TXT or [TX-PI](http://tx-pi.de).
+
+This plugin replaces the ftduino plugin when installed.
+
+The ftDuino needs to run the [ftduino_direct
+sketch](https://github.com/PeterDHabermehl/ftduino_direct).
+
+![ftduino plugin with ftDuino servo support](ftduino_servo.png)
+
+### ftDuino IO with PCA9685 servo support - ftduino_PCA9685.xml
 
 This plugin gives brickly access to a [PCA9585 based servo
 adapter](https://www.thingiverse.com/thing:3155362) connected via I²C
 to a [ftDuino](http://ftduino.de) which in turn is connected via USB
 to the TXT or [TX-PI](http://tx-pi.de).
 
+This plugin replaces the ftduino plugin when installed.
+
 The ftDuino needs to run the [ftduino_direct
 sketch](https://github.com/PeterDHabermehl/ftduino_direct).
 
-![ftduino plugin](ftduino_PCA9685.png)
+![ftduino plugin with PCA9685 support](ftduino_PCA9685.png)
 
 ### file IO - fileio.xml
 

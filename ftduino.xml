@@ -1,7 +1,7 @@
 <plugin name="ftduino" version="1.1">
   <!-- translations. At least english (en) is required -->
   <!-- english translations -->
-  <translations lang="en" name="ftDuino">>
+  <translations lang="en" name="ftDuino">
     <text id="catFtduino">ftDuino</text>
     <text id="led_message">set ftDuino LED %1</text>
     <text id="led_tooltip">Switch the red ftDuino LED</text>
@@ -105,7 +105,7 @@
 	    "name": "input_port",
 	    "options": [
               [ "I1", "I1" ], [ "I2", "I2" ], [ "I3", "I3" ], [ "I4", "I4" ],
-              [ "I5", "I4" ], [ "I6", "I6" ], [ "I7", "I7" ], [ "I8", "I8" ]
+              [ "I5", "I5" ], [ "I6", "I6" ], [ "I7", "I7" ], [ "I8", "I8" ]
 	    ]
           }
         ],
