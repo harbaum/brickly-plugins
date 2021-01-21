@@ -18,12 +18,26 @@ to install plugins.
 
 ### ftDuino IO - ftduino.xml
 
-This plugin gives brickly access to the IOs of an [ftDuino](http://ftduino.de)
-connected via USB to the TXT or [TX-PI](https://github.com/harbaum/tx-pi).
+This plugin gives brickly access to the IOs of an
+[ftDuino](http://ftduino.de) connected via USB to the TXT or
+[TX-PI](http://tx-pi.de).
 
-The ftDuino needs to run the [ftduino_direct sketch](https://github.com/PeterDHabermehl/ftduino_direct).
+The ftDuino needs to run the [ftduino_direct
+sketch](https://github.com/PeterDHabermehl/ftduino_direct).
 
 ![ftduino plugin](ftduino.png)
+
+### ftDuino PCA9685 servo driver - ftduino_PCA9685.xml
+
+This plugin gives brickly access to a [PCA9585 based servo
+adapter](https://www.thingiverse.com/thing:3155362) connected via I²C
+to a [ftDuino](http://ftduino.de) which in turn is connected via USB
+to the TXT or [TX-PI](http://tx-pi.de).
+
+The ftDuino needs to run the [ftduino_direct
+sketch](https://github.com/PeterDHabermehl/ftduino_direct).
+
+![ftduino plugin](ftduino_PCA9685.png)
 
 ### file IO - fileio.xml
 
